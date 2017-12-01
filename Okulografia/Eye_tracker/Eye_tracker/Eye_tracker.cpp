@@ -232,7 +232,7 @@ using namespace std;
 
 void main()
 {
-	fstream wyniki;
+	fstream wyniki,w;
 	//The number of connected USB camera(s)
 	const uint CAM_NUM = 2;
 
@@ -265,8 +265,6 @@ void main()
 		VideoWriter video1("Kamera2.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(frame_width1, frame_height1));
 
 
-
-
 		/*
 		//znalezienie parametrów filtra
 		namedWindow("Control", CV_WINDOW_AUTOSIZE);
@@ -292,22 +290,29 @@ void main()
 
 
 
-
-
 		int nr=0;
 		wyniki.open("Wyniki.csv", ios::out);
-		wyniki << "x,y,r,ramka"<< endl;
+		wyniki << "x; y; r; ramka" << endl;
 
 	//continous loop until 'Esc' key is pressed
 		while (waitKey(1) != 27) {
 
 			//capturing frame-by-frame from each capture
 			kanal0 >> camFrames0;
+
+			////obrót obrazu
+			Mat matRotation = getRotationMatrix2D(Point(camFrames0.cols / 2, camFrames0.rows / 2), 180, 1);
+
+			// Rotate the image
+			Mat matRotatedFrame;
+			warpAffine(camFrames0, matRotatedFrame, matRotation, camFrames0.size());
+			camFrames0=matRotatedFrame;
+
 			video0.write(camFrames0);
 			nr++;
 			
 			//showing the resulting frame using highgui
-			imshow(labels0, camFrames0);
+			//imshow(labels0, camFrames0);
 
 			kanal1 >> camFrames1;
 			video1.write(camFrames1);
@@ -352,7 +357,7 @@ void main()
 			{
 				Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
 				int radius = cvRound(circles[i][2]);
-				wyniki << cvRound(circles[i][0]) << "," << cvRound(circles[i][1]) <<","<< cvRound(circles[i][2]) <<","<< nr<< endl;
+				wyniki << cvRound(circles[i][0]) << "; " << cvRound(circles[i][1]) << "; " << cvRound(circles[i][2]) << "; " << nr << endl;
 
 				// circle center
 				circle(img0, center, 3, Scalar(0, 255, 0), -1, 8, 0);
@@ -361,8 +366,8 @@ void main()
 			}
 
 			/// Show your results
-			namedWindow("Hough Circle Transform Demo", CV_WINDOW_AUTOSIZE);
-			imshow("Hough Circle Transform Demo", img0);
+			namedWindow("Okregi", CV_WINDOW_AUTOSIZE);
+			imshow("Okregi", img0);
 
 
 
@@ -373,13 +378,7 @@ void main()
 			erode(binary, binary, element);            //Erozja
 //			imshow("zwykly", img0);            //Obrazek Orginalny
 			*/
-			imshow("binarny", binary);            //Obraz binarny
-
-
-
-
-
-
+			imshow("hcv", binary);            //Obraz binarny
 
 		}
 		wyniki.close();
@@ -391,12 +390,13 @@ void main()
 		video1.release();
 
 
-	/*
+
+	
 		// odczytanie pliku avi
-		CvCapture* vid = cvCreateFileCapture("C:/Users/patrycja/Desktop/Okulografia/Eye_tracker/Eye_tracker/Kamera1.avi");
+		CvCapture* vid = cvCreateFileCapture("E:/Okulografia/Okulografia/Eye_tracker/Eye_tracker/Kamera1.avi");
 
 		// tworzymy okno wyswietlajace obraz
-		cvNamedWindow("Kamera1", 0);
+		//cvNamedWindow("Kamera1", 0);
 
 		// odczytanie pierwszej klatki - niezbedne do prawidlowego odczytania wlasciwosci pliku
 		// przy uzyciu funkcji cvGetCaptureProperty
@@ -404,7 +404,15 @@ void main()
 
 		// odczytujemy z wlasciwosci pliku liczbe klatek na sekunde
 		double fps = cvGetCaptureProperty(vid, CV_CAP_PROP_FPS);
-
+		
+		/*
+		//Liczba ramek w pliku
+		w.open("Wy.csv", ios::out);
+		w << "f; fps = " << endl;
+		double f = cvGetCaptureProperty(vid, CV_CAP_PROP_FRAME_COUNT);
+		w << f<<" i "<<fps;
+		w.close();
+		*/
 		// wyliczamy czas potrzebny do odtwarzania pliku z prawidlowa prêdkoscia
 		int odstep_miedzy_klatkami = 1000 / fps;
 
@@ -435,5 +443,5 @@ void main()
 		// zwolnienie zasobów
 		cvDestroyAllWindows();
 		cvReleaseCapture(&vid);
-		*/
+		
 }
