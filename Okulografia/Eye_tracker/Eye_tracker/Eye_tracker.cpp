@@ -232,25 +232,26 @@ using namespace std;
 
 void main()
 {
-	fstream wyniki,w;
+
+	fstream wyniki,w;	// Tworzenie kana³ów dla plików
 	//The number of connected USB camera(s)
-	const uint CAM_NUM = 2;
+	const uint CAM_NUM = 2;		//Liczba kamer
 
 	//This will hold the VideoCapture objects
 	VideoCapture kanal0, kanal1;
 
 	//This will hold the resulting frames from each camera
 	Mat camFrames0, camFrames1;
-	Mat img0, hsv_img0, binary; //Miejsce na obrazki 
+	Mat img0, hsv_img0, binary, czolo; //Miejsce na obrazki 
 	vector<Mat> hsv_split;        //Miejsce na kana³y hsv 
 	//This will be used for highgui window name
-	string labels0, labels1;
+//	string labels0, labels1;
 	
 	//Initialization of VideoCaptures
 
 		//Init label for highgui window name
-		labels0 = "Camera " + to_string(0);
-		labels1 = "Camera " + to_string(1);
+	//	labels0 = "Camera " + to_string(0);
+	//	labels1 = "Camera " + to_string(1);
 		//Opening camera capture stream
 		kanal0.open(0);
 		kanal1.open(1);
@@ -263,8 +264,8 @@ void main()
 		// Define the codec and create VideoWriter object.The output is stored in 'outcpp.avi' file. 
 		VideoWriter video0("Kamera1.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(frame_width0, frame_height0));
 		VideoWriter video1("Kamera2.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(frame_width1, frame_height1));
-
-
+		VideoWriter video2("Czolo_z_okregami.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(frame_width0, frame_height0));
+		VideoWriter video3("Proba.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(frame_width0, frame_height0));
 		/*
 		//znalezienie parametrów filtra
 		namedWindow("Control", CV_WINDOW_AUTOSIZE);
@@ -297,32 +298,32 @@ void main()
 	//continous loop until 'Esc' key is pressed
 		while (waitKey(1) != 27) {
 
-			//capturing frame-by-frame from each capture
-			kanal0 >> camFrames0;
-
-			////obrót obrazu
-			Mat matRotation = getRotationMatrix2D(Point(camFrames0.cols / 2, camFrames0.rows / 2), 180, 1);
-
-			// Rotate the image
-			Mat matRotatedFrame;
-			warpAffine(camFrames0, matRotatedFrame, matRotation, camFrames0.size());
-			camFrames0=matRotatedFrame;
-
-			video0.write(camFrames0);
-			nr++;
-			
 			//showing the resulting frame using highgui
 			//imshow(labels0, camFrames0);
 
+			kanal0 >> camFrames0;
+			video0.write(camFrames0);
+			imshow("Obraz z czola", camFrames0);
+
+
+			//capturing frame-by-frame from each capture
 			kanal1 >> camFrames1;
+
+			////obrót obrazu
+			Mat matRotation = getRotationMatrix2D(Point(camFrames1.cols / 2, camFrames1.rows / 2), 180, 1);
+
+			// Rotate the image
+			Mat matRotatedFrame;
+			warpAffine(camFrames1, matRotatedFrame, matRotation, camFrames1.size());
+			camFrames1=matRotatedFrame;
+
 			video1.write(camFrames1);
-			imshow(labels1, camFrames1);
+			nr++;
+			
 
 
 
-
-
-			camFrames0.copyTo(img0); // Skopiowanie klatki do img
+			camFrames1.copyTo(img0); // Skopiowanie klatki do img
 			cvtColor(img0, hsv_img0, CV_BGR2HSV);        //Konwrsja do HSV
 			split(hsv_img0, hsv_split);        //Podzial HSV na poszczegolne kanaly
 			//inRange(hsv_split[0], 80, 255, binary);  //Progowanie zgodnie z wartosciami lowerb, i upperb
@@ -351,8 +352,9 @@ void main()
 			/// Apply the Hough Transform to find the circles
 			HoughCircles(src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows / 8, 200, 20, 0, 0);
 
-			/// Draw the circles detected
+			camFrames0.copyTo(czolo);
 
+			/// Draw the circles detected
 			for (size_t i = 0; i < circles.size(); i++)
 			{
 				Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
@@ -363,12 +365,18 @@ void main()
 				circle(img0, center, 3, Scalar(0, 255, 0), -1, 8, 0);
 				// circle outline
 				circle(img0, center, radius, Scalar(0, 0, 255), 3, 8, 0);
+
+				///czolo
+				circle(czolo, center, 30, Scalar(0, 255, 0), -1, 8, 0);
+				circle(czolo, center, radius, Scalar(0, 0, 255), 3, 8, 0);
+
 			}
 
 			/// Show your results
 			namedWindow("Okregi", CV_WINDOW_AUTOSIZE);
 			imshow("Okregi", img0);
 
+			video2.write(czolo);
 
 
 
@@ -383,7 +391,7 @@ void main()
 		}
 		wyniki.close();
 	//Releasing all VideoCapture resources
-
+		video2.release();
 		kanal0.release();
 		video0.release();
 		kanal1.release();
@@ -394,38 +402,50 @@ void main()
 	
 		// odczytanie pliku avi
 		CvCapture* vid = cvCreateFileCapture("E:/Okulografia/Okulografia/Eye_tracker/Eye_tracker/Kamera1.avi");
-
+	//	CvCapture* vid2 = cvCreateFileCapture("E:/Okulografia/Okulografia/Eye_tracker/Eye_tracker/Kamera2.avi");
 		// tworzymy okno wyswietlajace obraz
 		//cvNamedWindow("Kamera1", 0);
 
 		// odczytanie pierwszej klatki - niezbedne do prawidlowego odczytania wlasciwosci pliku
 		// przy uzyciu funkcji cvGetCaptureProperty
 		cvQueryFrame(vid);
-
+	//	cvQueryFrame(vid2);
 		// odczytujemy z wlasciwosci pliku liczbe klatek na sekunde
 		double fps = cvGetCaptureProperty(vid, CV_CAP_PROP_FPS);
-		
+//		double fps2 = cvGetCaptureProperty(vid2, CV_CAP_PROP_FPS);
 		/*
 		//Liczba ramek w pliku
 		w.open("Wy.csv", ios::out);
-		w << "f; fps = " << endl;
+		w << "f; fps; fps2 " << endl;
 		double f = cvGetCaptureProperty(vid, CV_CAP_PROP_FRAME_COUNT);
-		w << f<<" i "<<fps;
+		double ff = cvGetCaptureProperty(vid2, CV_CAP_PROP_FRAME_COUNT);
+		w << f << " ; " << fps << ";" << ff << ";"<< fps2;
 		w.close();
 		*/
 		// wyliczamy czas potrzebny do odtwarzania pliku z prawidlowa prêdkoscia
 		int odstep_miedzy_klatkami = 1000 / fps;
-
+		
+		int x = 50, y = 100;
+		Point srodek(x, y);//tworzenie punktu do zczytania z wyniku
+		Mat proba;
 		while (true)
 		{
 			// pobranie kolejnej ramki
 			IplImage* ramka = cvQueryFrame(vid);
-
+			proba = cvarrToMat(ramka);
+			circle(proba, srodek, 30, Scalar(0, 255, 0), -1, 8, 0);
 			// jezeli nie jest pusta to wyswietlamy
 			if (ramka != 0)
-				cvShowImage("plik wideo", ramka);
+			{
+				//cvShowImage("plik wideo", ramka);
+
+				//do³o¿one
+				video3.write(proba);
+				imshow("Obraz z czola i okregi", proba);
+			}
 			else
 				break;
+
 
 
 
@@ -439,7 +459,7 @@ void main()
 				break;
 
 		}
-
+		video3.release();
 		// zwolnienie zasobów
 		cvDestroyAllWindows();
 		cvReleaseCapture(&vid);
