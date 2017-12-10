@@ -232,7 +232,7 @@ using namespace std;
 
 void main()
 {
-
+	
 	fstream wyniki,w;	// Tworzenie kana³ów dla plików
 	//The number of connected USB camera(s)
 	const uint CAM_NUM = 2;		//Liczba kamer
@@ -293,7 +293,7 @@ void main()
 
 		int nr=0;
 		wyniki.open("Wyniki.csv", ios::out);
-		wyniki << "x; y; r; ramka" << endl;
+		wyniki << "ramka; x; y; r" << endl;
 
 	//continous loop until 'Esc' key is pressed
 		while (waitKey(1) != 27) {
@@ -359,7 +359,7 @@ void main()
 			{
 				Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
 				int radius = cvRound(circles[i][2]);
-				wyniki << cvRound(circles[i][0]) << "; " << cvRound(circles[i][1]) << "; " << cvRound(circles[i][2]) << "; " << nr << endl;
+				wyniki << nr << "; " << cvRound(circles[i][0]) << "; " << cvRound(circles[i][1]) << "; " << cvRound(circles[i][2]) << endl;
 
 				// circle center
 				circle(img0, center, 3, Scalar(0, 255, 0), -1, 8, 0);
@@ -398,6 +398,74 @@ void main()
 		video1.release();
 
 
+		///zliczanie liczby lini pliku
+		ifstream plik;
+		string  wiersz;
+		int linia;
+		int licznik = 0;
+		plik.open("Wyniki.csv");
+		while (getline(plik, wiersz)) licznik++;
+		plik.close();
+
+		/// spisanie tablicy wyników
+		int nr_lini;
+		plik.open("Wyniki.csv");
+
+		if (plik.good() == false)
+		{
+			cout << "Nie uda³o siê otworzyæ pliku";
+			exit(0);
+		}
+
+		string sram, sx, sy, sr;
+		int tab[3];
+		int **tabwy;
+		tabwy = new int *[licznik];
+		for (int i = 0; i < licznik; i++)
+			tabwy[i] = new int[3];
+
+		int ram, x, y, r, ipom = 0;
+
+		while (getline(plik, wiersz))
+		{
+			int i = 0;
+			int znalezionaPozycja = wiersz.find(";");
+			cout << endl;
+			do
+			{
+				tab[i] = znalezionaPozycja + 1;
+				i++;
+				znalezionaPozycja = wiersz.find(";", znalezionaPozycja + 1);
+
+			} while (znalezionaPozycja != std::string::npos);
+
+			sram = wiersz.substr(0, tab[0] - 1);
+			ram = atoi(sram.c_str());
+			sx = wiersz.substr(tab[0], tab[1] - tab[0] - 1);
+			x = atoi(sx.c_str());
+			sy = wiersz.substr(tab[1], tab[2] - tab[1] - 1);
+			y = atoi(sy.c_str());
+			sr = wiersz.substr(tab[2], wiersz.length());
+			r = atoi(sr.c_str());
+			tabwy[ipom][0] = ram;
+			tabwy[ipom][1] = x;
+			tabwy[ipom][2] = y;
+			tabwy[ipom][3] = r;
+			ipom++;
+		}
+		plik.close();
+
+		for (int i = 0; i < licznik; i++)
+		{
+			for (int j = 0; j < 4; j++)
+				cout << tabwy[i][j] << " ";
+
+			cout << endl;
+		}
+
+
+
+
 
 	
 		// odczytanie pliku avi
@@ -409,6 +477,7 @@ void main()
 		// odczytanie pierwszej klatki - niezbedne do prawidlowego odczytania wlasciwosci pliku
 		// przy uzyciu funkcji cvGetCaptureProperty
 		cvQueryFrame(vid);
+		nr = 1;
 	//	cvQueryFrame(vid2);
 		// odczytujemy z wlasciwosci pliku liczbe klatek na sekunde
 		double fps = cvGetCaptureProperty(vid, CV_CAP_PROP_FPS);
@@ -425,14 +494,24 @@ void main()
 		// wyliczamy czas potrzebny do odtwarzania pliku z prawidlowa prêdkoscia
 		int odstep_miedzy_klatkami = 1000 / fps;
 		
-		int x = 50, y = 100;
-		Point srodek(x, y);//tworzenie punktu do zczytania z wyniku
+		int srx=-50, sry=-50;
+		//Point srodek(srx, sry);//tworzenie punktu do zczytania z wyniku
 		Mat proba;
 		while (true)
 		{
+			
 			// pobranie kolejnej ramki
 			IplImage* ramka = cvQueryFrame(vid);
+			for (int i = 0; i <licznik; i++)
+			{
+				if (nr == tabwy[i][0])
+				{
+					srx = tabwy[i][1];
+					sry = tabwy[i][2];
+				}
+			}
 			proba = cvarrToMat(ramka);
+			Point srodek(srx, sry);
 			circle(proba, srodek, 30, Scalar(0, 255, 0), -1, 8, 0);
 			// jezeli nie jest pusta to wyswietlamy
 			if (ramka != 0)
@@ -442,6 +521,7 @@ void main()
 				//do³o¿one
 				video3.write(proba);
 				imshow("Obraz z czola i okregi", proba);
+				nr++;
 			}
 			else
 				break;
@@ -463,5 +543,8 @@ void main()
 		// zwolnienie zasobów
 		cvDestroyAllWindows();
 		cvReleaseCapture(&vid);
+
+
+		system("pause");
 		
 }
