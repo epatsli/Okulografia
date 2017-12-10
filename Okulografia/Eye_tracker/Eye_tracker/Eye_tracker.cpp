@@ -494,7 +494,7 @@ void main()
 		// wyliczamy czas potrzebny do odtwarzania pliku z prawidlowa prêdkoscia
 		int odstep_miedzy_klatkami = 1000 / fps;
 		
-		int srx=-50, sry=-50;
+		int srx=-50, sry=-50, srx5=-50, srx4=-50, srx3=-50, srx2=-50, srx1=-50, sry5 = -50, sry4 = -50, sry3 = -50, sry2 = -50, sry1 = -50;
 		//Point srodek(srx, sry);//tworzenie punktu do zczytania z wyniku
 		Mat proba;
 		while (true)
@@ -510,9 +510,38 @@ void main()
 					sry = tabwy[i][2];
 				}
 			}
+
+			srx5 = srx4;
+			sry5 = sry4;
+			srx4 = srx3;
+			sry4 = sry3;
+			srx3 = srx2;
+			sry3 = sry2;
+			srx2 = srx1;
+			sry2 = sry1;
+			srx1 = srx;
+			sry1 = sry;
+
 			proba = cvarrToMat(ramka);
 			Point srodek(srx, sry);
+			Point srodek1(srx1, sry1);
+			Point srodek2(srx2, sry2);
+			Point srodek3(srx3, sry3);
+			Point srodek4(srx4, sry4);
+			Point srodek5(srx5, sry5);
+
 			circle(proba, srodek, 30, Scalar(0, 255, 0), -1, 8, 0);
+			circle(proba, srodek1, 25, Scalar(0, 125, 0), -1, 8, 0);
+			circle(proba, srodek2, 22, Scalar(125, 225, 0), -1, 8, 0);
+			circle(proba, srodek3, 18, Scalar(255, 255, 0), -1, 8, 0);
+			circle(proba, srodek4, 32, Scalar(125, 125, 0), -1, 8, 0);
+			circle(proba, srodek5, 38, Scalar(125, 255, 125), -1, 8, 0);
+
+			switch (nr)
+				case 1: 
+					break;
+
+
 			// jezeli nie jest pusta to wyswietlamy
 			if (ramka != 0)
 			{
