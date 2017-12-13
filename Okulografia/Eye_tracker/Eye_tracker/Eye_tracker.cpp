@@ -234,38 +234,26 @@ void main()
 {
 	
 	fstream wyniki,w;	// Tworzenie kana³ów dla plików
-	//The number of connected USB camera(s)
 	const uint CAM_NUM = 2;		//Liczba kamer
-
-	//This will hold the VideoCapture objects
-	VideoCapture kanal0, kanal1;
-
-	//This will hold the resulting frames from each camera
-	Mat camFrames0, camFrames1;
-	Mat img0, hsv_img0, binary, czolo; //Miejsce na obrazki 
-	vector<Mat> hsv_split;        //Miejsce na kana³y hsv 
-	//This will be used for highgui window name
-//	string labels0, labels1;
 	
-	//Initialization of VideoCaptures
+	VideoCapture kanalczolo, kanaloko;  //This will hold the VideoCapture objects
+	
+	Mat RamkaCzolo, RamkaOko;  //This will hold the resulting frames from each camera
+	Mat img0, hsv_img0, binary, czolo; //Miejsce na obrazki 
+//	vector<Mat> hsv_split;        //Miejsce na kana³y hsv 
+	
+		kanalczolo.open(0);  //Otwieranie strumienia przechwytywania danych
+		kanaloko.open(1);
 
-		//Init label for highgui window name
-	//	labels0 = "Camera " + to_string(0);
-	//	labels1 = "Camera " + to_string(1);
-		//Opening camera capture stream
-		kanal0.open(0);
-		kanal1.open(1);
-
-
-		int frame_width0 = kanal0.get(CV_CAP_PROP_FRAME_WIDTH); //do zapisu wymiary
-		int frame_height0 = kanal0.get(CV_CAP_PROP_FRAME_HEIGHT);
-		int frame_width1 = kanal1.get(CV_CAP_PROP_FRAME_WIDTH); //do zapisu wymiary
-		int frame_height1 = kanal1.get(CV_CAP_PROP_FRAME_HEIGHT);
+		int frame_width0 = kanalczolo.get(CV_CAP_PROP_FRAME_WIDTH); //do zapisu wymiary
+		int frame_height0 = kanalczolo.get(CV_CAP_PROP_FRAME_HEIGHT);
+		int frame_width1 = kanaloko.get(CV_CAP_PROP_FRAME_WIDTH); //do zapisu wymiary
+		int frame_height1 = kanaloko.get(CV_CAP_PROP_FRAME_HEIGHT);
 		// Define the codec and create VideoWriter object.The output is stored in 'outcpp.avi' file. 
-		VideoWriter video0("Kamera1.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(frame_width0, frame_height0));
-		VideoWriter video1("Kamera2.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(frame_width1, frame_height1));
+		VideoWriter video0("Czolo.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(frame_width0, frame_height0));
+		VideoWriter video1("Oko.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(frame_width1, frame_height1));
 		VideoWriter video2("Czolo_z_okregami.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(frame_width0, frame_height0));
-		VideoWriter video3("Proba.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(frame_width0, frame_height0));
+		VideoWriter video3("Analiza.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(frame_width0, frame_height0));
 		/*
 		//znalezienie parametrów filtra
 		namedWindow("Control", CV_WINDOW_AUTOSIZE);
@@ -289,41 +277,28 @@ void main()
 		cvCreateTrackbar("HighV", "Control", &iHighV, 255);
 		*/
 
-
-
 		int nr=0;
-		wyniki.open("Wyniki.csv", ios::out);
+		wyniki.open("Wyniki.csv", ios::out);	//Tworzenie pliku z wynikami
 		wyniki << "ramka; x; y; r" << endl;
 
-	//continous loop until 'Esc' key is pressed
-		while (waitKey(1) != 27) {
+		while (waitKey(1) != 27) {			//continous loop until 'Esc' key is pressed
 
-			//showing the resulting frame using highgui
-			//imshow(labels0, camFrames0);
+			kanalczolo >> RamkaCzolo;
+			video0.write(RamkaCzolo);
+			imshow("Obraz z czola", RamkaCzolo);
 
-			kanal0 >> camFrames0;
-			video0.write(camFrames0);
-			imshow("Obraz z czola", camFrames0);
+			kanaloko >> RamkaOko;  // przechywtywanie klatka po klatce z ka¿dego ujêcia
 
+			//Obrót obrazu
+			Mat MacierzRotacji = getRotationMatrix2D(Point(RamkaOko.cols / 2, RamkaOko.rows / 2), 270, 1);
+			Mat RamkaRotacji;
+			warpAffine(RamkaOko, RamkaRotacji, MacierzRotacji, RamkaOko.size());
+			RamkaOko = RamkaRotacji;
 
-			//capturing frame-by-frame from each capture
-			kanal1 >> camFrames1;
-
-			////obrót obrazu
-			Mat matRotation = getRotationMatrix2D(Point(camFrames1.cols / 2, camFrames1.rows / 2), 180, 1);
-
-			// Rotate the image
-			Mat matRotatedFrame;
-			warpAffine(camFrames1, matRotatedFrame, matRotation, camFrames1.size());
-			camFrames1=matRotatedFrame;
-
-			video1.write(camFrames1);
+			video1.write(RamkaOko);
 			nr++;
-			
-
-
-
-			camFrames1.copyTo(img0); // Skopiowanie klatki do img
+			/*
+			RamkaOko.copyTo(img0); // Skopiowanie klatki do img
 			cvtColor(img0, hsv_img0, CV_BGR2HSV);        //Konwrsja do HSV
 			split(hsv_img0, hsv_split);        //Podzial HSV na poszczegolne kanaly
 			//inRange(hsv_split[0], 80, 255, binary);  //Progowanie zgodnie z wartosciami lowerb, i upperb
@@ -336,69 +311,77 @@ void main()
 			//morphological closing (fill small holes in the foreground)
 			dilate(binary, binary, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 			erode(binary, binary, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-
-			
-
+			*/
+		
 			//Kopiowanie do szaroœci i szukanie okrêgów
-			/// Convert it to gray
+			RamkaOko.copyTo(img0); // Skopiowanie klatki do img
 			Mat src_gray;
 			cvtColor(img0, src_gray, CV_BGR2GRAY);
 
-			/// Reduce the noise so we avoid false circle detection
-			GaussianBlur(src_gray, src_gray, Size(9, 9), 2, 2);
-
+			GaussianBlur(src_gray, src_gray, Size(9, 9), 2, 2);  /// Reduce the noise so we avoid false circle detection
 			vector<Vec3f> circles;
+			
+			HoughCircles(src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows / 8, 200, 20, 0, 0); /// Apply the Hough Transform to find the circles
 
-			/// Apply the Hough Transform to find the circles
-			HoughCircles(src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows / 8, 200, 20, 0, 0);
+			RamkaCzolo.copyTo(czolo);
 
-			camFrames0.copyTo(czolo);
-
-			/// Draw the circles detected
+			// Wykrywanie i rysowanie okrêgów
 			for (size_t i = 0; i < circles.size(); i++)
 			{
 				Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
 				int radius = cvRound(circles[i][2]);
+				
 				wyniki << nr << "; " << cvRound(circles[i][0]) << "; " << cvRound(circles[i][1]) << "; " << cvRound(circles[i][2]) << endl;
 
-				// circle center
-				circle(img0, center, 3, Scalar(0, 255, 0), -1, 8, 0);
-				// circle outline
-				circle(img0, center, radius, Scalar(0, 0, 255), 3, 8, 0);
-
-				///czolo
+				circle(img0, center, 3, Scalar(0, 255, 0), -1, 8, 0); //œreodek okrêgu
+				circle(img0, center, radius, Scalar(0, 0, 255), 3, 8, 0); // kontur okrêgu
+				//czolo
 				circle(czolo, center, 30, Scalar(0, 255, 0), -1, 8, 0);
 				circle(czolo, center, radius, Scalar(0, 0, 255), 3, 8, 0);
-
+				//ellipse(img0, center, s, double angle, double startAngle, double endAngle, const Scalar& color, int thickness = 1, int lineType = 8, int shift = 0)¶
 			}
 
-			/// Show your results
+
+
+
+
+
+
+/*
+			vector<vector<Point> > contours;
+			//vector<RotatedRect> rotRecs;
+			findContours(img0, contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+
+			RotatedRect rotRecs[contours.size()];
+
+			for (int i = 0; i < contours.size(); i++) {
+				rotRecs[i] = fitEllipse(contours[i]);
+			}
+*/
+
+
+			// Rysowanie okrêgów na kamerze
 			namedWindow("Okregi", CV_WINDOW_AUTOSIZE);
 			imshow("Okregi", img0);
-
 			video2.write(czolo);
-
-
 
 			/*
 			cv::Mat element(3, 3, CV_8U, cv::Scalar(1));    //Okreslenie opcji erozji
 			blur(binary, binary, cv::Size(3, 3));        //Rozmycie
 			erode(binary, binary, element);            //Erozja
-//			imshow("zwykly", img0);            //Obrazek Orginalny
-			*/
+			imshow("zwykly", img0);            //Obrazek Orginalny
 			imshow("hcv", binary);            //Obraz binarny
-
+			*/
 		}
 		wyniki.close();
-	//Releasing all VideoCapture resources
-		video2.release();
-		kanal0.release();
+	
+		video2.release();//Zwolnienie wszystkich zasobów VideoCapture
+		kanalczolo.release();
 		video0.release();
-		kanal1.release();
+		kanaloko.release();
 		video1.release();
 
-
-		///zliczanie liczby lini pliku
+		//Zliczanie liczby lini pliku
 		ifstream plik;
 		string  wiersz;
 		int linia;
@@ -407,7 +390,7 @@ void main()
 		while (getline(plik, wiersz)) licznik++;
 		plik.close();
 
-		/// spisanie tablicy wyników
+		//Utworzenie tablicy wyników
 		int nr_lini;
 		plik.open("Wyniki.csv");
 
@@ -462,25 +445,18 @@ void main()
 
 			cout << endl;
 		}
-
-
-
-
-
 	
-		// odczytanie pliku avi
-		CvCapture* vid = cvCreateFileCapture("E:/Okulografia/Okulografia/Eye_tracker/Eye_tracker/Kamera1.avi");
-	//	CvCapture* vid2 = cvCreateFileCapture("E:/Okulografia/Okulografia/Eye_tracker/Eye_tracker/Kamera2.avi");
+		
+		CvCapture* vid = cvCreateFileCapture("E:/Okulografia/Okulografia/Eye_tracker/Eye_tracker/Czolo.avi"); // Odczytanie pliku avi
+		//CvCapture* vid2 = cvCreateFileCapture("E:/Okulografia/Okulografia/Eye_tracker/Eye_tracker/Oko.avi");
 		// tworzymy okno wyswietlajace obraz
 		//cvNamedWindow("Kamera1", 0);
 
-		// odczytanie pierwszej klatki - niezbedne do prawidlowego odczytania wlasciwosci pliku
-		// przy uzyciu funkcji cvGetCaptureProperty
-		cvQueryFrame(vid);
+		cvQueryFrame(vid); // odczytanie pierwszej klatki - niezbedne do prawidlowego odczytania wlasciwosci pliku przy uzyciu funkcji cvGetCaptureProperty
 		nr = 1;
 	//	cvQueryFrame(vid2);
-		// odczytujemy z wlasciwosci pliku liczbe klatek na sekunde
-		double fps = cvGetCaptureProperty(vid, CV_CAP_PROP_FPS);
+		
+		double fps = cvGetCaptureProperty(vid, CV_CAP_PROP_FPS); // odczytujemy z wlasciwosci pliku liczbe klatek na sekunde
 //		double fps2 = cvGetCaptureProperty(vid2, CV_CAP_PROP_FPS);
 		/*
 		//Liczba ramek w pliku
@@ -491,12 +467,12 @@ void main()
 		w << f << " ; " << fps << ";" << ff << ";"<< fps2;
 		w.close();
 		*/
-		// wyliczamy czas potrzebny do odtwarzania pliku z prawidlowa prêdkoscia
-		int odstep_miedzy_klatkami = 1000 / fps;
+		
+		int odstep_miedzy_klatkami = 1000 / fps; // wyliczamy czas potrzebny do odtwarzania pliku z prawidlowa prêdkoscia
 		
 		int srx=-50, sry=-50, srx5=-50, srx4=-50, srx3=-50, srx2=-50, srx1=-50, sry5 = -50, sry4 = -50, sry3 = -50, sry2 = -50, sry1 = -50;
 		//Point srodek(srx, sry);//tworzenie punktu do zczytania z wyniku
-		Mat proba;
+		Mat analiza;
 		while (true)
 		{
 			
@@ -522,7 +498,7 @@ void main()
 			srx1 = srx;
 			sry1 = sry;
 
-			proba = cvarrToMat(ramka);
+			analiza = cvarrToMat(ramka);
 			Point srodek(srx, sry);
 			Point srodek1(srx1, sry1);
 			Point srodek2(srx2, sry2);
@@ -530,50 +506,37 @@ void main()
 			Point srodek4(srx4, sry4);
 			Point srodek5(srx5, sry5);
 
-			circle(proba, srodek, 30, Scalar(0, 255, 0), -1, 8, 0);
-			circle(proba, srodek1, 25, Scalar(0, 125, 0), -1, 8, 0);
-			circle(proba, srodek2, 22, Scalar(125, 225, 0), -1, 8, 0);
-			circle(proba, srodek3, 18, Scalar(255, 255, 0), -1, 8, 0);
-			circle(proba, srodek4, 32, Scalar(125, 125, 0), -1, 8, 0);
-			circle(proba, srodek5, 38, Scalar(125, 255, 125), -1, 8, 0);
-
-			switch (nr)
-				case 1: 
-					break;
+			circle(analiza, srodek5, 10, Scalar(0, 100, 0), -1, 8, 0);
+			circle(analiza, srodek4, 14, Scalar(0, 125, 0), -1, 8, 0);
+			circle(analiza, srodek3, 18, Scalar(0, 150, 0), -1, 8, 0);
+			circle(analiza, srodek2, 22, Scalar(0, 175, 0), -1, 8, 0);
+			circle(analiza, srodek1, 25, Scalar(0, 215, 0), -1, 8, 0);
+			circle(analiza, srodek, 30, Scalar(0, 255, 0), -1, 8, 0);
 
 
-			// jezeli nie jest pusta to wyswietlamy
-			if (ramka != 0)
+			if (ramka != 0) // Je¿eli nie jest pusta to wyœwietlamy
 			{
 				//cvShowImage("plik wideo", ramka);
 
 				//do³o¿one
-				video3.write(proba);
-				imshow("Obraz z czola i okregi", proba);
+				video3.write(analiza);
+				imshow("Obraz z czola i okregi", analiza);
 				nr++;
 			}
 			else
 				break;
 
+			
+			int c = cvWaitKey(odstep_miedzy_klatkami); // Czekamy przez okreœlony czas
 
-
-
-
-
-			// czekamy przez okreslony czas
-			int c = cvWaitKey(odstep_miedzy_klatkami);
-
-			// jezeli nacisnieto klawisz 'k', konczymy wyswietlanie
-			if (c == 'k')
+			if (c == 'k') // Je¿eli naciœniêto klawisz 'k' koñczymy wyswietlanie
 				break;
-
 		}
+
 		video3.release();
 		// zwolnienie zasobów
 		cvDestroyAllWindows();
 		cvReleaseCapture(&vid);
 
-
 		system("pause");
-		
 }
