@@ -1,227 +1,4 @@
-// Eye_tracker.cpp : Defines the entry point for the console application.
-//
-/*
-#include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include <iostream>
-using namespace cv;
-using namespace std;
-#include "stdafx.h"
-
-
-int main()
-{
-	Mat img(650, 600, CV_16UC3, Scalar(0, 50000, 50000)); //create an image ( 3 channels, 16 bit image depth, 650 high, 600 wide, (0, 50000, 50000) assigned for Blue, Green and Red plane respectively. )
-
-	if (img.empty()) //check whether the image is loaded or not
-	{
-		cout << "ERROR : Image cannot be loaded..!!" << endl;
-		//system("pause"); //wait for a key press
-		return -1;
-	}
-
-	vector<int> compression_params; //vector that stores the compression parameters of the image
-
-	compression_params.push_back(CV_IMWRITE_JPEG_QUALITY); //specify the compression technique
-
-	compression_params.push_back(98); //specify the compression quality
-
-
-
-	bool bSuccess = imwrite("C:/Users/patrycja/Desktop/20171015_141307.jpg", img, compression_params); //write the image to file
-
-
-
-	if (!bSuccess)
-
-	{
-
-		cout << "ERROR : Failed to save the image" << endl;
-
-		//system("pause"); //wait for a key press
-
-	}
-
-	namedWindow("MyWindow", CV_WINDOW_AUTOSIZE); //create a window with the name "MyWindow"
-	imshow("MyWindow", img); //display the image which is stored in the 'img' in the "MyWindow" window
-
-	waitKey(0);  //wait for a keypress
-
-	destroyWindow("MyWindow"); //destroy the window with the name, "MyWindow"
-
-    return 0;
-}
-*/
-/**
-* @file Morphology_1.cpp
-* @brief Erosion and Dilation sample code
-* @author OpenCV team
-*/
-
-/*
-#include "opencv2/imgproc.hpp"
-#include "opencv2/imgcodecs.hpp"
-#include "opencv2/highgui.hpp"
-
-using namespace cv;
-
-/// Global variables
-Mat src, erosion_dst, dilation_dst;
-
-int erosion_elem = 0;
-int erosion_size = 0;
-int dilation_elem = 0;
-int dilation_size = 0;
-int const max_elem = 2;
-int const max_kernel_size = 21;
-
-void Erosion(int, void*);
-void Dilation(int, void*);
-
-int main(int, char** argv)
-{
-	/// Load an image
-	src = imread(argv[1], IMREAD_COLOR);
-
-	if (src.empty())
-	{
-		return -1;
-	}
-
-	/// Create windows
-	namedWindow("Erosion Demo", WINDOW_AUTOSIZE);
-	namedWindow("Dilation Demo", WINDOW_AUTOSIZE);
-	moveWindow("Dilation Demo", src.cols, 0);
-
-	/// Create Erosion Trackbar
-	createTrackbar("Element:\n 0: Rect \n 1: Cross \n 2: Ellipse", "Erosion Demo",
-		&erosion_elem, max_elem,
-		Erosion);
-
-	createTrackbar("Kernel size:\n 2n +1", "Erosion Demo",
-		&erosion_size, max_kernel_size,
-		Erosion);
-
-	/// Create Dilation Trackbar
-	createTrackbar("Element:\n 0: Rect \n 1: Cross \n 2: Ellipse", "Dilation Demo",
-		&dilation_elem, max_elem,
-		Dilation);
-
-	createTrackbar("Kernel size:\n 2n +1", "Dilation Demo",
-		&dilation_size, max_kernel_size,
-		Dilation);
-
-	/// Default start
-	Erosion(0, 0);
-	Dilation(0, 0);
-
-	waitKey(0);
-	return 0;
-}
-
-
-void Erosion(int, void*)
-{
-	int erosion_type = 0;
-	if (erosion_elem == 0) { erosion_type = MORPH_RECT; }
-	else if (erosion_elem == 1) { erosion_type = MORPH_CROSS; }
-	else if (erosion_elem == 2) { erosion_type = MORPH_ELLIPSE; }
-
-	//![kernel]
-	Mat element = getStructuringElement(erosion_type,
-		Size(2 * erosion_size + 1, 2 * erosion_size + 1),
-		Point(erosion_size, erosion_size));
-	//![kernel]
-
-	/// Apply the erosion operation
-	erode(src, erosion_dst, element);
-	imshow("Erosion Demo", erosion_dst);
-}
-
-void Dilation(int, void*)
-{
-	int dilation_type = 0;
-	if (dilation_elem == 0) { dilation_type = MORPH_RECT; }
-	else if (dilation_elem == 1) { dilation_type = MORPH_CROSS; }
-	else if (dilation_elem == 2) { dilation_type = MORPH_ELLIPSE; }
-
-	Mat element = getStructuringElement(dilation_type,
-		Size(2 * dilation_size + 1, 2 * dilation_size + 1),
-		Point(dilation_size, dilation_size));
-
-	/// Apply the dilation operation
-	dilate(src, dilation_dst, element);
-	imshow("Dilation Demo", dilation_dst);
-}
-//![dilation]
-*/
-
-/*
-* File:   main.cpp
-* Author: sagar
-*
-* Created on 10 September, 2012, 7:48 PM
-*/
-
-
-
-/*OK
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/videoio.hpp>  // Video write
-#include <iostream>
-using namespace cv;
-using namespace std;
-
-int main() {
-	VideoCapture stream1(0);   //0 is the id of video device.0 if you have only one camera.
-	VideoCapture stream2(1);
-
-	if (!stream1.isOpened()) { //check if video device has been initialised
-		cout << "cannot open camera1";
-	}
-
-	if (!stream2.isOpened()) { //check if video device has been initialised
-		cout << "cannot open camera2";
-	}
-
-	//stream1.set(CV_CAP_PROP_FRAME_WIDTH, 320);
-	//stream1.set(CV_CAP_PROP_FRAME_HEIGHT, 240);
-	int frame_width1 = stream1.get(CV_CAP_PROP_FRAME_WIDTH); //do zapisu wymiary
-	int frame_height1 = stream1.get(CV_CAP_PROP_FRAME_HEIGHT);
-	int frame_width2 = stream2.get(CV_CAP_PROP_FRAME_WIDTH); //do zapisu wymiary
-	int frame_height2 = stream2.get(CV_CAP_PROP_FRAME_HEIGHT);
-	// Define the codec and create VideoWriter object.The output is stored in 'outcpp.avi' file. 
-	VideoWriter video1("Kamera1.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(frame_width1, frame_height1));
-	VideoWriter video2("Kamera1.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, Size(frame_width2, frame_height2));
-	//unconditional loop
-	while (true) {
-		Mat cameraFrame, cameraFrame1;
-		stream1.read(cameraFrame);
-		video1.write(cameraFrame);
-		imshow("kamera1", cameraFrame);
-
-		stream2.read(cameraFrame);
-		imshow("kamera2", cameraFrame1);
-
-		if (waitKey(30) >= 0)
-			break;
-	}
-
-	// When everything done, release the video capture and write object
-	stream1.release();
-	video1.release();
-	stream2.release();
-	video2.release();
-
-
-	return 0;
-}
-
-
-*/
-
-#include <opencv2/core/core.hpp>
+Ôªø#include <opencv2/core/core.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2\videoio.hpp>
 #include <opencv2\highgui.hpp>
@@ -231,433 +8,587 @@ int main() {
 #include <fstream>
 #include "popt_pp1.h"
 #include "stdafx.h"
-//#include <Windows.h>
+#include <opencv2/core/utility.hpp>
+#include "opencv2/imgproc.hpp"
+#include "opencv2/imgcodecs.hpp"
 using namespace cv;
 using namespace std;
 
-//kali
-
-vector< vector< Point3f > > object_points;
-vector< vector< Point2f > > image_points;
-vector< Point2f > corners;
-vector< vector< Point2f > > left_img_points;
 
 Mat img, gray;
 Size im_size;
-
-void setup_calibration(int board_width, int board_height, int num_imgs,
-	float square_size, char* imgs_directory, char* imgs_filename,
-	char* extension) {
-	Size board_size = Size(board_width, board_height);
-	int board_n = board_width * board_height;
-
-	for (int k = 1; k <= num_imgs; k++) {
-		char img_file[100];
-		sprintf(img_file, "%s%s%d.%s", imgs_directory, imgs_filename, k, extension);
-		img = imread(img_file, CV_LOAD_IMAGE_COLOR);
-		cv::cvtColor(img, gray, CV_BGR2GRAY);
-
-		bool found = false;
-		found = cv::findChessboardCorners(img, board_size, corners,
-			CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
-		if (found)
-		{
-			cornerSubPix(gray, corners, cv::Size(5, 5), cv::Size(-1, -1),
-				TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 30, 0.1));
-			drawChessboardCorners(gray, board_size, corners, found);
-		}
-
-		vector< Point3f > obj;
-		for (int i = 0; i < board_height; i++)
-			for (int j = 0; j < board_width; j++)
-				obj.push_back(Point3f((float)j * square_size, (float)i * square_size, 0));
-
-		if (found) {
-			cout << k << ". Found corners!" << endl;
-			image_points.push_back(corners);
-			object_points.push_back(obj);
-		}
-	}
-}
-
-double computeReprojectionErrors(const vector< vector< Point3f > >& objectPoints,
-	const vector< vector< Point2f > >& imagePoints,
-	const vector< Mat >& rvecs, const vector< Mat >& tvecs,
-	const Mat& cameraMatrix, const Mat& distCoeffs) {
-	vector< Point2f > imagePoints2;
-	int i, totalPoints = 0;
-	double totalErr = 0, err;
-	vector< float > perViewErrors;
-	perViewErrors.resize(objectPoints.size());
-
-	for (i = 0; i < (int)objectPoints.size(); ++i) {
-		projectPoints(Mat(objectPoints[i]), rvecs[i], tvecs[i], cameraMatrix,
-			distCoeffs, imagePoints2);
-		err = norm(Mat(imagePoints[i]), Mat(imagePoints2), CV_L2);
-		int n = (int)objectPoints[i].size();
-		perViewErrors[i] = (float)std::sqrt(err*err / n);
-		totalErr += err*err;
-		totalPoints += n;
-	}
-	return std::sqrt(totalErr / totalPoints);
-}
-//kali
-
-//void main(
-	int main(int argc, char* argv[])
-{
-		/*
-		//kali
-		int board_width, board_height, num_imgs;
-		float square_size;
-		char* imgs_directory;
-		char* imgs_filename;
-		char* out_file;
-		char* extension;
-
-		static struct poptOption options[] = {
-			{ "board_width",'w',POPT_ARG_INT,&board_width,0,"Checkerboard width","NUM" },
-			{ "board_height",'h',POPT_ARG_INT,&board_height,0,"Checkerboard height","NUM" },
-			{ "num_imgs",'n',POPT_ARG_INT,&num_imgs,0,"Number of checkerboard images","NUM" },
-			{ "square_size",'s',POPT_ARG_FLOAT,&square_size,0,"Size of checkerboard square","NUM" },
-			{ "imgs_directory",'d',POPT_ARG_STRING,&imgs_directory,0,"Directory containing images","STR" },
-			{ "imgs_filename",'i',POPT_ARG_STRING,&imgs_filename,0,"Image filename","STR" },
-			{ "extension",'e',POPT_ARG_STRING,&extension,0,"Image extension","STR" },
-			{ "out_file",'o',POPT_ARG_STRING,&out_file,0,"Output calibration filename (YML)","STR" },
-			POPT_AUTOHELP
-		{ NULL, 0, 0, NULL, 0, NULL, NULL }
-		};
-
-		POpt popt(NULL, argc, argv, options, 0);
-		int c;
-		while ((c = popt.getNextOpt()) >= 0) {}
-
-		setup_calibration(board_width, board_height, num_imgs, square_size,imgs_directory, imgs_filename, extension);
-
-		printf("Starting Calibration\n");
-		Mat K;
-		Mat D;
-		vector< Mat > rvecs, tvecs;
-		int flag = 0;
-		flag |= CV_CALIB_FIX_K4;
-		flag |= CV_CALIB_FIX_K5;
-		calibrateCamera(object_points, image_points, img.size(), K, D, rvecs, tvecs, flag);
-
-		cout << "Calibration error: " << computeReprojectionErrors(object_points, image_points, rvecs, tvecs, K, D) << endl;
-
-		FileStorage fs(out_file, FileStorage::WRITE);
-		fs << "K" << K;
-		fs << "D" << D;
-		fs << "board_width" << board_width;
-		fs << "board_height" << board_height;
-		fs << "square_size" << square_size;
-		printf("Done Calibration\n");
-
-		//kali
-		*/
-
-	fstream wyniki,w;	// Tworzenie kana≥Ûw dla plikÛw
-	const uint CAM_NUM = 2;		//Liczba kamer
-	
-	VideoCapture kanalczolo, kanaloko;  //This will hold the VideoCapture objects
-	
-	Mat RamkaCzolo, RamkaOko;  //This will hold the resulting frames from each camera
-	Mat img0, hsv_img0, binary, czolo; //Miejsce na obrazki 
-//	vector<Mat> hsv_split;        //Miejsce na kana≥y hsv 
-	
-		kanalczolo.open(0);  //Otwieranie strumienia przechwytywania danych
-		kanaloko.open(1);
-
-		int frame_width0 = kanalczolo.get(CV_CAP_PROP_FRAME_WIDTH); //do zapisu wymiary
-		int frame_height0 = kanalczolo.get(CV_CAP_PROP_FRAME_HEIGHT);
-		int frame_width1 = kanaloko.get(CV_CAP_PROP_FRAME_WIDTH); //do zapisu wymiary
-		int frame_height1 = kanaloko.get(CV_CAP_PROP_FRAME_HEIGHT);
-		cout << "Czolo szer. " << frame_width0 << ", wys. " << frame_height0 << endl;
-		cout << "Oko szer. " << frame_width1 << ", wys. " << frame_height1 << endl;
-		// Define the codec and create VideoWriter object.The output is stored in 'outcpp.avi' file. 
-		VideoWriter video0("Czolo.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, Size(frame_width0, frame_height0));
-		VideoWriter video1("Oko.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, Size(frame_width1, frame_height1));
-		VideoWriter video2("Czolo_z_okregami.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, Size(frame_width0, frame_height0));
-		VideoWriter video3("Analiza.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, Size(frame_width0, frame_height0));
-		/*
-		//znalezienie parametrÛw filtra
-		namedWindow("Control", CV_WINDOW_AUTOSIZE);
-		int iLowH = 0;
-		int iHighH = 179;
-
-		int iLowS = 0;
-		int iHighS = 255;
-
-		int iLowV = 0;
-		int iHighV = 255;
-
-		//Create trackbars in "Control" window
-		cvCreateTrackbar("LowH", "Control", &iLowH, 179); //Hue (0 - 179)
-		cvCreateTrackbar("HighH", "Control", &iHighH, 179);
-
-		cvCreateTrackbar("LowS", "Control", &iLowS, 255); //Saturation (0 - 255)
-		cvCreateTrackbar("HighS", "Control", &iHighS, 255);
-
-		cvCreateTrackbar("LowV", "Control", &iLowV, 255); //Value (0 - 255)
-		cvCreateTrackbar("HighV", "Control", &iHighV, 255);
-		*/
-
-		int nr=0;
-		wyniki.open("Wyniki.csv", ios::out);	//Tworzenie pliku z wynikami
-		wyniki << "ramka; x; y; r" << endl;
-
-		while (waitKey(1) != 27) {			//continous loop until 'Esc' key is pressed
-
-			kanalczolo >> RamkaCzolo;
-			video0.write(RamkaCzolo);
-			imshow("Obraz z czola", RamkaCzolo);
-
-			kanaloko >> RamkaOko;  // przechwtywanie klatka po klatce z kaødego ujÍcia
-
-			//ObrÛt obrazu
-			Mat MacierzRotacji = getRotationMatrix2D(Point(RamkaOko.cols / 2, RamkaOko.rows / 2), 260, 1);
-			//Mat MacierzRotacji = getRotationMatrix2D(Point(RamkaOko.cols, RamkaOko.rows), 270, 1);
-			Mat RamkaRotacji;
-			warpAffine(RamkaOko, RamkaRotacji, MacierzRotacji, RamkaOko.size());
-			RamkaOko = RamkaRotacji;
-
-			video1.write(RamkaOko);
-			nr++;
-			/*
-			RamkaOko.copyTo(img0); // Skopiowanie klatki do img
-			cvtColor(img0, hsv_img0, CV_BGR2HSV);        //Konwrsja do HSV
-			split(hsv_img0, hsv_split);        //Podzial HSV na poszczegolne kanaly
-			//inRange(hsv_split[0], 80, 255, binary);  //Progowanie zgodnie z wartosciami lowerb, i upperb
-			//inRange(hsv_split[0], Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), binary);
-			inRange(hsv_split[0], Scalar(150, 182, 65), Scalar(163, 215, 111), binary);
-			//morphological opening (remove small objects from the foreground)
-			erode(binary, binary, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-			dilate(binary, binary, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-
-			//morphological closing (fill small holes in the foreground)
-			dilate(binary, binary, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-			erode(binary, binary, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-			*/
-		
-			//Kopiowanie do szaroúci i szukanie okrÍgÛw
-			RamkaOko.copyTo(img0); // Skopiowanie klatki do img
-			Mat src_gray;
-			cvtColor(img0, src_gray, CV_BGR2GRAY);
-
-			GaussianBlur(src_gray, src_gray, Size(9, 9), 2, 2);  /// Reduce the noise so we avoid false circle detection
-			vector<Vec3f> circles;
-			
-			HoughCircles(src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows / 8, 200, 20, 0, 0); /// Apply the Hough Transform to find the circles
-
-			RamkaCzolo.copyTo(czolo);
-
-			// Wykrywanie i rysowanie okrÍgÛw
-			for (size_t i = 0; i < circles.size(); i++)
-			{
-				Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-				int radius = cvRound(circles[i][2]);
-				
-				wyniki << nr << "; " << cvRound(circles[i][0]) << "; " << cvRound(circles[i][1]) << "; " << cvRound(circles[i][2]) << endl;
-				img = img0;
-				flip(img, img0, 1);//odwracanie obrazu wzglÍdem y
-				
-				circle(img0, center, 3, Scalar(0, 255, 0), -1, 8, 0); //úrodek okrÍgu
-				circle(img0, center, radius, Scalar(0, 0, 255), 3, 8, 0); // kontur okrÍgu
-				//czolo
-				circle(czolo, center, 30, Scalar(0, 255, 0), -1, 8, 0);
-				circle(czolo, center, radius, Scalar(0, 0, 255), 3, 8, 0);
-				//ellipse(img0, center, s, double angle, double startAngle, double endAngle, const Scalar& color, int thickness = 1, int lineType = 8, int shift = 0)∂
-			}
-
+/// w d√≥≈Ç kalibracja poprawna
 /*
-			vector<vector<Point> > contours;
-			//vector<RotatedRect> rotRecs;
-			findContours(img0, contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+#include <cctype>
+#include <stdio.h>
+//#include <string.h>
+#include <time.h>
 
-			RotatedRect rotRecs[contours.size()];
+using namespace cv;
+using namespace std;
 
-			for (int i = 0; i < contours.size(); i++) {
-				rotRecs[i] = fitEllipse(contours[i]);
-			}
+const char * usage =
+" \nexample command line for calibration from a live feed.\n"
+"   calibration  -w=4 -h=5 -s=0.025 -o=camera.yml -op -oe\n"
+" \n"
+" example command line for calibration from a list of stored images:\n"
+"   imagelist_creator image_list.xml *.png\n"
+"   calibration -w=4 -h=5 -s=0.025 -o=camera.yml -op -oe image_list.xml\n"
+" where image_list.xml is the standard OpenCV XML/YAML\n"
+" use imagelist_creator to create the xml or yaml list\n"
+" file consisting of the list of strings, e.g.:\n"
+" \n"
+"<?xml version=\"1.0\"?>\n"
+"<opencv_storage>\n"
+"<images>\n"
+"view000.png\n"
+"view001.png\n"
+"<!-- view002.png -->\n"
+"view003.png\n"
+"view010.png\n"
+"one_extra_view.jpg\n"
+"</images>\n"
+"</opencv_storage>\n";
+
+
+
+
+const char* liveCaptureHelp =
+"When the live video from camera is used as input, the following hot-keys may be used:\n"
+"  <ESC>, 'q' - quit the program\n"
+"  'g' - start capturing images\n"
+"  'u' - switch undistortion on/off\n";
+
+static void help()
+{
+printf("This is a camera calibration sample.\n"
+"Usage: calibration\n"
+"     -w=<board_width>         # the number of inner corners per one of board dimension\n"
+"     -h=<board_height>        # the number of inner corners per another board dimension\n"
+"     [-pt=<pattern>]          # the type of pattern: chessboard or circles' grid\n"
+"     [-n=<number_of_frames>]  # the number of frames to use for calibration\n"
+"                              # (if not specified, it will be set to the number\n"
+"                              #  of board views actually available)\n"
+"     [-d=<delay>]             # a minimum delay in ms between subsequent attempts to capture a next view\n"
+"                              # (used only for video capturing)\n"
+"     [-s=<squareSize>]       # square size in some user-defined units (1 by default)\n"
+"     [-o=<out_camera_params>] # the output filename for intrinsic [and extrinsic] parameters\n"
+"     [-op]                    # write detected feature points\n"
+"     [-oe]                    # write extrinsic parameters\n"
+"     [-zt]                    # assume zero tangential distortion\n"
+"     [-a=<aspectRatio>]      # fix aspect ratio (fx/fy)\n"
+"     [-p]                     # fix the principal point at the center\n"
+"     [-v]                     # flip the captured images around the horizontal axis\n"
+"     [-V]                     # use a video file, and not an image list, uses\n"
+"                              # [input_data] string for the video file name\n"
+"     [-su]                    # show undistorted images after calibration\n"
+"     [input_data]             # input data, one of the following:\n"
+"                              #  - text file with a list of the images of the board\n"
+"                              #    the text file can be generated with imagelist_creator\n"
+"                              #  - name of video file with a video of the board\n"
+"                              # if input_data not specified, a live view from the camera is used\n"
+"\n");
+printf("\n%s", usage);
+printf("\n%s", liveCaptureHelp);
+}
+
+enum { DETECTION = 0, CAPTURING = 1, CALIBRATED = 2 };
+enum Pattern { CHESSBOARD, CIRCLES_GRID, ASYMMETRIC_CIRCLES_GRID };
+
+static double computeReprojectionErrors(
+const vector<vector<Point3f> >& objectPoints,
+const vector<vector<Point2f> >& imagePoints,
+const vector<Mat>& rvecs, const vector<Mat>& tvecs,
+const Mat& cameraMatrix, const Mat& distCoeffs,
+vector<float>& perViewErrors)
+{
+vector<Point2f> imagePoints2;
+int i, totalPoints = 0;
+double totalErr = 0, err;
+perViewErrors.resize(objectPoints.size());
+
+for (i = 0; i < (int)objectPoints.size(); i++)
+{
+projectPoints(Mat(objectPoints[i]), rvecs[i], tvecs[i],
+cameraMatrix, distCoeffs, imagePoints2);
+err = norm(Mat(imagePoints[i]), Mat(imagePoints2), NORM_L2);
+int n = (int)objectPoints[i].size();
+perViewErrors[i] = (float)std::sqrt(err*err / n);
+totalErr += err*err;
+totalPoints += n;
+}
+
+return std::sqrt(totalErr / totalPoints);
+}
+
+static void calcChessboardCorners(Size boardSize, float squareSize, vector<Point3f>& corners, Pattern patternType = CHESSBOARD)
+{
+corners.resize(0);
+
+switch (patternType)
+{
+case CHESSBOARD:
+case CIRCLES_GRID:
+for (int i = 0; i < boardSize.height; i++)
+for (int j = 0; j < boardSize.width; j++)
+corners.push_back(Point3f(float(j*squareSize),
+float(i*squareSize), 0));
+break;
+
+case ASYMMETRIC_CIRCLES_GRID:
+for (int i = 0; i < boardSize.height; i++)
+for (int j = 0; j < boardSize.width; j++)
+corners.push_back(Point3f(float((2 * j + i % 2)*squareSize),
+float(i*squareSize), 0));
+break;
+
+default:
+CV_Error(Error::StsBadArg, "Unknown pattern type\n");
+}
+}
+
+static bool runCalibration(vector<vector<Point2f> > imagePoints,
+Size imageSize, Size boardSize, Pattern patternType,
+float squareSize, float aspectRatio,
+int flags, Mat& cameraMatrix, Mat& distCoeffs,
+vector<Mat>& rvecs, vector<Mat>& tvecs,
+vector<float>& reprojErrs,
+double& totalAvgErr)
+{
+cameraMatrix = Mat::eye(3, 3, CV_64F);
+if (flags & CALIB_FIX_ASPECT_RATIO)
+cameraMatrix.at<double>(0, 0) = aspectRatio;
+
+distCoeffs = Mat::zeros(8, 1, CV_64F);
+
+vector<vector<Point3f> > objectPoints(1);
+calcChessboardCorners(boardSize, squareSize, objectPoints[0], patternType);
+
+objectPoints.resize(imagePoints.size(), objectPoints[0]);
+
+double rms = calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix,
+distCoeffs, rvecs, tvecs, flags | CALIB_FIX_K4 | CALIB_FIX_K5);
+//|CALIB_FIX_K3|CALIB_FIX_K4|CALIB_FIX_K5);
+printf("RMS error reported by calibrateCamera: %g\n", rms);
+
+bool ok = checkRange(cameraMatrix) && checkRange(distCoeffs);
+
+totalAvgErr = computeReprojectionErrors(objectPoints, imagePoints,
+rvecs, tvecs, cameraMatrix, distCoeffs, reprojErrs);
+
+return ok;
+}
+
+
+static void saveCameraParams(const string& filename,
+Size imageSize, Size boardSize,
+float squareSize, float aspectRatio, int flags,
+const Mat& cameraMatrix, const Mat& distCoeffs,
+const vector<Mat>& rvecs, const vector<Mat>& tvecs,
+const vector<float>& reprojErrs,
+const vector<vector<Point2f> >& imagePoints,
+double totalAvgErr)
+{
+FileStorage fs(filename, FileStorage::WRITE);
+
+time_t tt;
+time(&tt);
+struct tm *t2 = localtime(&tt);
+char buf[1024];
+strftime(buf, sizeof(buf) - 1, "%c", t2);
+
+fs << "calibration_time" << buf;
+
+if (!rvecs.empty() || !reprojErrs.empty())
+fs << "nframes" << (int)std::max(rvecs.size(), reprojErrs.size());
+fs << "image_width" << imageSize.width;
+fs << "image_height" << imageSize.height;
+fs << "board_width" << boardSize.width;
+fs << "board_height" << boardSize.height;
+fs << "square_size" << squareSize;
+
+if (flags & CALIB_FIX_ASPECT_RATIO)
+fs << "aspectRatio" << aspectRatio;
+
+if (flags != 0)
+{
+sprintf(buf, "flags: %s%s%s%s",
+flags & CALIB_USE_INTRINSIC_GUESS ? "+use_intrinsic_guess" : "",
+flags & CALIB_FIX_ASPECT_RATIO ? "+fix_aspectRatio" : "",
+flags & CALIB_FIX_PRINCIPAL_POINT ? "+fix_principal_point" : "",
+flags & CALIB_ZERO_TANGENT_DIST ? "+zero_tangent_dist" : "");
+//cvWriteComment( *fs, buf, 0 );
+}
+
+fs << "flags" << flags;
+
+fs << "camera_matrix" << cameraMatrix;
+fs << "distortion_coefficients" << distCoeffs;
+
+fs << "avg_reprojection_error" << totalAvgErr;
+if (!reprojErrs.empty())
+fs << "per_view_reprojection_errors" << Mat(reprojErrs);
+
+if (!rvecs.empty() && !tvecs.empty())
+{
+CV_Assert(rvecs[0].type() == tvecs[0].type());
+Mat bigmat((int)rvecs.size(), 6, rvecs[0].type());
+for (int i = 0; i < (int)rvecs.size(); i++)
+{
+Mat r = bigmat(Range(i, i + 1), Range(0, 3));
+Mat t = bigmat(Range(i, i + 1), Range(3, 6));
+
+CV_Assert(rvecs[i].rows == 3 && rvecs[i].cols == 1);
+CV_Assert(tvecs[i].rows == 3 && tvecs[i].cols == 1);
+//*.t() is MatExpr (not Mat) so we can use assignment operator
+r = rvecs[i].t();
+t = tvecs[i].t();
+}
+//cvWriteComment( *fs, "a set of 6-tuples (rotation vector + translation vector) for each view", 0 );
+fs << "extrinsic_parameters" << bigmat;
+}
+
+if (!imagePoints.empty())
+{
+Mat imagePtMat((int)imagePoints.size(), (int)imagePoints[0].size(), CV_32FC2);
+for (int i = 0; i < (int)imagePoints.size(); i++)
+{
+Mat r = imagePtMat.row(i).reshape(2, imagePtMat.cols);
+Mat imgpti(imagePoints[i]);
+imgpti.copyTo(r);
+}
+fs << "image_points" << imagePtMat;
+}
+}
+
+static bool readStringList(const string& filename, vector<string>& l)
+{
+l.resize(0);
+FileStorage fs(filename, FileStorage::READ);
+if (!fs.isOpened())
+return false;
+FileNode n = fs.getFirstTopLevelNode();
+if (n.type() != FileNode::SEQ)
+return false;
+FileNodeIterator it = n.begin(), it_end = n.end();
+for (; it != it_end; ++it)
+l.push_back((string)*it);
+return true;
+}
+
+
+static bool runAndSave(const string& outputFilename,
+const vector<vector<Point2f> >& imagePoints,
+Size imageSize, Size boardSize, Pattern patternType, float squareSize,
+float aspectRatio, int flags, Mat& cameraMatrix,
+Mat& distCoeffs, bool writeExtrinsics, bool writePoints)
+{
+vector<Mat> rvecs, tvecs;
+vector<float> reprojErrs;
+double totalAvgErr = 0;
+
+bool ok = runCalibration(imagePoints, imageSize, boardSize, patternType, squareSize,
+aspectRatio, flags, cameraMatrix, distCoeffs,
+rvecs, tvecs, reprojErrs, totalAvgErr);
+printf("%s. avg reprojection error = %.2f\n",
+ok ? "Calibration succeeded" : "Calibration failed",
+totalAvgErr);
+
+if (ok)
+saveCameraParams(outputFilename, imageSize,
+boardSize, squareSize, aspectRatio,
+flags, cameraMatrix, distCoeffs,
+writeExtrinsics ? rvecs : vector<Mat>(),
+writeExtrinsics ? tvecs : vector<Mat>(),
+writeExtrinsics ? reprojErrs : vector<float>(),
+writePoints ? imagePoints : vector<vector<Point2f> >(),
+totalAvgErr);
+return ok;
+}
 */
 
-			// Rysowanie okrÍgÛw na kamerze
-			namedWindow("Okregi", CV_WINDOW_AUTOSIZE);
-			imshow("Okregi", img0);
-			video2.write(czolo);
+int main(int argc, char* argv[])
+{
 
-			/*
-			cv::Mat element(3, 3, CV_8U, cv::Scalar(1));    //Okreslenie opcji erozji
-			blur(binary, binary, cv::Size(3, 3));        //Rozmycie
-			erode(binary, binary, element);            //Erozja
-			imshow("zwykly", img0);            //Obrazek Orginalny
-			imshow("hcv", binary);            //Obraz binarny
-			*/
-		}
-		wyniki.close();
+	fstream wyniki;	// Tworzenie kana≈Ç√≥w dla plik√≥w
+	const uint CAM_NUM = 2;		//Liczba kamer
+
+	VideoCapture kanalczolo, kanaloko;  //This will hold the VideoCapture objects
+
+	Mat RamkaCzolo, RamkaOko;  //This will hold the resulting frames from each camera
+	Mat img0, hsv_img0, binary, czolo; //Miejsce na obrazki 
+
+	kanalczolo.open(0);  //Otwieranie strumienia przechwytywania danych
+	kanaloko.open(1);
+
+	int frame_width0 = kanalczolo.get(CV_CAP_PROP_FRAME_WIDTH); //do zapisu wymiary
+	int frame_height0 = kanalczolo.get(CV_CAP_PROP_FRAME_HEIGHT);
+	int frame_width1 = kanaloko.get(CV_CAP_PROP_FRAME_WIDTH); //do zapisu wymiary
+	int frame_height1 = kanaloko.get(CV_CAP_PROP_FRAME_HEIGHT);
+	cout << "Czolo szer. " << frame_width0 << ", wys. " << frame_height0 << endl;
+	cout << "Oko szer. " << frame_width1 << ", wys. " << frame_height1 << endl;
+	// Define the codec and create VideoWriter object.The output is stored in 'outcpp.avi' file. 
+	VideoWriter video0("Czolo.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, Size(frame_width0, frame_height0));
+	VideoWriter video1("Oko.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, Size(frame_width1, frame_height1));
+	VideoWriter video2("Czolo_z_okregami.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, Size(frame_width0, frame_height0));
+	VideoWriter video3("Analiza.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, Size(frame_width0, frame_height0));
 	
-		video2.release();//Zwolnienie wszystkich zasobÛw VideoCapture
-		kanalczolo.release();
-		video0.release();
-		kanaloko.release();
-		video1.release();
 
-		//Zliczanie liczby lini pliku
-		ifstream plik;
-		string  wiersz;
-		int linia;
-		int licznik = 0;
-		plik.open("Wyniki.csv");
-		while (getline(plik, wiersz)) licznik++;
-		plik.close();
+//	int ldx = 0, ldy = 0, lgx, lgy, pdx, pdy, pgx, pgy, ro;
+	int **tp;
+	tp = new int *[10];
+	for (int i = 0; i < 10; i++)
+		tp[i] = new int[2];
 
-		//Utworzenie tablicy wynikÛw
-		int nr_lini;
-		plik.open("Wyniki.csv");
+	/*
+	//znalezienie parametr√≥w filtra
+	namedWindow("Control", CV_WINDOW_AUTOSIZE);
+	int iLowH = 0;
+	int iHighH = 179;
 
-		if (plik.good() == false)
-		{
-			cout << "Nie uda≥o siÍ otworzyÊ pliku";
-			exit(0);
-		}
+	int iLowS = 0;
+	int iHighS = 255;
 
-		string sram, sx, sy, sr;
-		int tab[3];
-		int **tabwy;
-		tabwy = new int *[licznik];
-		for (int i = 0; i < licznik; i++)
-			tabwy[i] = new int[3];
+	int iLowV = 0;
+	int iHighV = 255;
 
-		int ram, x, y, r, ipom = 0;
+	//Create trackbars in "Control" window
+	cvCreateTrackbar("LowH", "Control", &iLowH, 179); //Hue (0 - 179)
+	cvCreateTrackbar("HighH", "Control", &iHighH, 179);
 
-		while (getline(plik, wiersz))
-		{
-			int i = 0;
-			int znalezionaPozycja = wiersz.find(";");
-			cout << endl;
-			do
-			{
-				tab[i] = znalezionaPozycja + 1;
-				i++;
-				znalezionaPozycja = wiersz.find(";", znalezionaPozycja + 1);
+	cvCreateTrackbar("LowS", "Control", &iLowS, 255); //Saturation (0 - 255)
+	cvCreateTrackbar("HighS", "Control", &iHighS, 255);
 
-			} while (znalezionaPozycja != std::string::npos);
+	cvCreateTrackbar("LowV", "Control", &iLowV, 255); //Value (0 - 255)
+	cvCreateTrackbar("HighV", "Control", &iHighV, 255);
+	*/
 
-			sram = wiersz.substr(0, tab[0] - 1);
-			ram = atoi(sram.c_str());
-			sx = wiersz.substr(tab[0], tab[1] - tab[0] - 1);
-			x = atoi(sx.c_str());
-			sy = wiersz.substr(tab[1], tab[2] - tab[1] - 1);
-			y = atoi(sy.c_str());
-			sr = wiersz.substr(tab[2], wiersz.length());
-			r = atoi(sr.c_str());
-			tabwy[ipom][0] = ram;
-			tabwy[ipom][1] = x;
-			tabwy[ipom][2] = y;
-			tabwy[ipom][3] = r;
-			ipom++;
-		}
-		plik.close();
+	int nr = 0;
+	wyniki.open("Wyniki.csv", ios::out);	//Tworzenie pliku z wynikami
+	wyniki << "ramka; x; y; r" << endl;
 
-		for (int i = 0; i < licznik; i++)
-		{
-			for (int j = 0; j < 4; j++)
-				cout << tabwy[i][j] << " ";
+	while (waitKey(1) != 27) {			//continous loop until 'Esc' key is pressed
 
-			cout << endl;
-		}
-	
-		
-		CvCapture* vid = cvCreateFileCapture("E:/Okulografia/Okulografia/Eye_tracker/Eye_tracker/Czolo.avi"); // Odczytanie pliku avi
-		//CvCapture* vid2 = cvCreateFileCapture("E:/Okulografia/Okulografia/Eye_tracker/Eye_tracker/Oko.avi");
-		// tworzymy okno wyswietlajace obraz
-		//cvNamedWindow("Kamera1", 0);
+		kanalczolo >> RamkaCzolo;
+		imshow("Obraz z czola", RamkaCzolo);
 
-		cvQueryFrame(vid); // odczytanie pierwszej klatki - niezbedne do prawidlowego odczytania wlasciwosci pliku przy uzyciu funkcji cvGetCaptureProperty
-		nr = 1;
-	//	cvQueryFrame(vid2);
-		
-		double fps = cvGetCaptureProperty(vid, CV_CAP_PROP_FPS); // odczytujemy z wlasciwosci pliku liczbe klatek na sekunde
-//		double fps2 = cvGetCaptureProperty(vid2, CV_CAP_PROP_FPS);
+		kanaloko >> RamkaOko;  // przechwtywanie klatka po klatce z ka≈ºdego ujƒôcia
+
+		//Obr√≥t obrazu
+		Mat MacierzRotacji = getRotationMatrix2D(Point(RamkaOko.cols / 2, RamkaOko.rows / 2), 260, 1);
+		Mat RamkaRotacji;
+		warpAffine(RamkaOko, RamkaRotacji, MacierzRotacji, RamkaOko.size());
+		RamkaOko = RamkaRotacji;
+
 		/*
-		//Liczba ramek w pliku
-		w.open("Wy.csv", ios::out);
-		w << "f; fps; fps2 " << endl;
-		double f = cvGetCaptureProperty(vid, CV_CAP_PROP_FRAME_COUNT);
-		double ff = cvGetCaptureProperty(vid2, CV_CAP_PROP_FRAME_COUNT);
-		w << f << " ; " << fps << ";" << ff << ";"<< fps2;
-		w.close();
+		RamkaOko.copyTo(img0); // Skopiowanie klatki do img
+		cvtColor(img0, hsv_img0, CV_BGR2HSV);        //Konwrsja do HSV
+		split(hsv_img0, hsv_split);        //Podzial HSV na poszczegolne kanaly
+		//inRange(hsv_split[0], 80, 255, binary);  //Progowanie zgodnie z wartosciami lowerb, i upperb
+		//inRange(hsv_split[0], Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), binary);
+		inRange(hsv_split[0], Scalar(150, 182, 65), Scalar(163, 215, 111), binary);
+		//morphological opening (remove small objects from the foreground)
+		erode(binary, binary, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+		dilate(binary, binary, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+
+		//morphological closing (fill small holes in the foreground)
+		dilate(binary, binary, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+		erode(binary, binary, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 		*/
+
+		//Kopiowanie do szaro≈õci i szukanie okrƒôg√≥w
+		RamkaOko.copyTo(img0); // Skopiowanie klatki do img
+		Mat src_gray;
+		cvtColor(img0, src_gray, CV_BGR2GRAY);
+
+		GaussianBlur(src_gray, src_gray, Size(9, 9), 2, 2);  /// Reduce the noise so we avoid false circle detection
+		vector<Vec3f> circles;
+
+		HoughCircles(src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows / 8, 200, 20, 0, 0); /// Apply the Hough Transform to find the circles
 		
-		int odstep_miedzy_klatkami = 1000 / fps; // wyliczamy czas potrzebny do odtwarzania pliku z prawidlowa prÍdkoscia
-		
-		int srx=-50, sry=-50, srx5=-50, srx4=-50, srx3=-50, srx2=-50, srx1=-50, sry5 = -50, sry4 = -50, sry3 = -50, sry2 = -50, sry1 = -50;
-		//Point srodek(srx, sry);//tworzenie punktu do zczytania z wyniku
-		Mat analiza;
-		while (true)
+		nr++;
+
+		video1.write(RamkaOko);
+		video0.write(RamkaCzolo);
+		RamkaCzolo.copyTo(czolo);
+
+		// Wykrywanie i rysowanie okrƒôg√≥w
+		for (size_t i = 0; i < circles.size(); i++)
 		{
-			
-			// pobranie kolejnej ramki
-			IplImage* ramka = cvQueryFrame(vid);
-			for (int i = 0; i <licznik; i++)
-			{
-				if (nr == tabwy[i][0])
-				{
-					srx = 640 - tabwy[i][1];
-					sry = tabwy[i][2];
-				}
-			}
+			Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+			int radius = cvRound(circles[i][2]);
 
-			srx5 = srx4;
-			sry5 = sry4;
-			srx4 = srx3;
-			sry4 = sry3;
-			srx3 = srx2;
-			sry3 = sry2;
-			srx2 = srx1;
-			sry2 = sry1;
-			srx1 = srx;
-			sry1 = sry;
+			wyniki << nr << "; " << 640-cvRound(circles[i][0]) << "; " << cvRound(circles[i][1]) << "; " << cvRound(circles[i][2]) << endl;
+		//	img = img0;
+		//	flip(img, img0, 1);//odwracanie obrazu wzglƒôdem y
 
-			analiza = cvarrToMat(ramka);
-			Point srodek(srx, sry);
-			Point srodek1(srx1, sry1);
-			Point srodek2(srx2, sry2);
-			Point srodek3(srx3, sry3);
-			Point srodek4(srx4, sry4);
-			Point srodek5(srx5, sry5);
-
-			circle(analiza, srodek5, 10, Scalar(0, 100, 0), 4, 0, 0);
-			circle(analiza, srodek4, 14, Scalar(0, 125, 0), 4, 0, 0);
-			circle(analiza, srodek3, 18, Scalar(0, 150, 0), 4, 0, 0);
-			circle(analiza, srodek2, 22, Scalar(0, 175, 0), 4, 0, 0);
-			circle(analiza, srodek1, 25, Scalar(0, 215, 0), 4, 0, 0);
-			circle(analiza, srodek, 30, Scalar(0, 255, 0), 4, 0, 0);
-
-
-			if (ramka != 0) // Jeøeli nie jest pusta to wyúwietlamy
-			{
-				//cvShowImage("plik wideo", ramka);
-
-				//do≥oøone
-				video3.write(analiza);
-				imshow("Obraz z czola i okregi", analiza);
-				nr++;
-			}
-			else
-				break;
-
-			
-			int c = cvWaitKey(odstep_miedzy_klatkami); // Czekamy przez okreúlony czas
-
-			if (c == 'k') // Jeøeli naciúniÍto klawisz 'k' koÒczymy wyswietlanie
-				break;
+			circle(img0, center, 3, Scalar(0, 255, 0), -1, 8, 0); //≈õrodek okrƒôgu
+			circle(img0, center, radius, Scalar(0, 0, 255), 3, 8, 0); // kontur okrƒôgu
+																	  //czolo
+			circle(czolo, center, 30, Scalar(0, 255, 0), -1, 8, 0);
+			circle(czolo, center, radius, Scalar(0, 0, 255), 3, 8, 0);
+			//ellipse(img0, center, s, double angle, double startAngle, double endAngle, const Scalar& color, int thickness = 1, int lineType = 8, int shift = 0)¬∂
 		}
 
-		video3.release();
-		// zwolnienie zasobÛw
-		cvDestroyAllWindows();
-		cvReleaseCapture(&vid);
+		// Rysowanie okrƒôg√≥w na kamerze
+		namedWindow("Okregi", CV_WINDOW_AUTOSIZE);
+		imshow("Okregi", img0);
+		video2.write(czolo);
+		imshow("Ooooo", czolo);
+	}
+	wyniki.close();
 
-		system("pause");
+	video2.release();//Zwolnienie wszystkich zasob√≥w VideoCapture
+	kanalczolo.release();
+	video0.release();
+	kanaloko.release();
+	video1.release();
+
+	//Zliczanie liczby lini pliku
+	ifstream plik;
+	string  wiersz;
+	int linia;
+	int licznik = 0;
+	plik.open("Wyniki.csv");
+	while (getline(plik, wiersz)) licznik++;
+	plik.close();
+
+	//Utworzenie tablicy wynik√≥w
+	int nr_lini;
+	plik.open("Wyniki.csv");
+
+	if (plik.good() == false)
+	{
+		cout << "Nie uda≈Ço siƒô otworzyƒá pliku";
+		exit(0);
+	}
+
+	string sram, sx, sy, sr;
+	int tab[3];
+	int **tabwy;
+	tabwy = new int *[licznik];
+	for (int i = 0; i < licznik; i++)
+		tabwy[i] = new int[3];
+
+	int ram, x, y, r, ipom = 0;
+
+	while (getline(plik, wiersz))
+	{
+		int i = 0;
+		int znalezionaPozycja = wiersz.find(";");
+		cout << endl;
+		do
+		{
+			tab[i] = znalezionaPozycja + 1;
+			i++;
+			znalezionaPozycja = wiersz.find(";", znalezionaPozycja + 1);
+
+		} while (znalezionaPozycja != std::string::npos);
+
+		sram = wiersz.substr(0, tab[0] - 1);
+		ram = atoi(sram.c_str());
+		sx = wiersz.substr(tab[0], tab[1] - tab[0] - 1);
+		x = atoi(sx.c_str());
+		sy = wiersz.substr(tab[1], tab[2] - tab[1] - 1);
+		y = atoi(sy.c_str());
+		sr = wiersz.substr(tab[2], wiersz.length());
+		r = atoi(sr.c_str());
+		tabwy[ipom][0] = ram;
+		tabwy[ipom][1] = x;
+		tabwy[ipom][2] = y;
+		tabwy[ipom][3] = r;
+		ipom++;
+	}
+	plik.close();
+
+	for (int i = 0; i < licznik; i++)
+	{
+		for (int j = 0; j < 4; j++)
+			cout << tabwy[i][j] << " ";
+
+		cout << endl;
+	}
+
+
+	CvCapture* vid = cvCreateFileCapture("E:/Okulografia/Okulografia/Eye_tracker/Eye_tracker/Czolo.avi"); // Odczytanie pliku avi
+	cvQueryFrame(vid); // odczytanie pierwszej klatki - niezbedne do prawidlowego odczytania wlasciwosci pliku przy uzyciu funkcji cvGetCaptureProperty
+	nr = 1;
+
+	double fps = cvGetCaptureProperty(vid, CV_CAP_PROP_FPS); // odczytujemy z wlasciwosci pliku liczbe klatek na sekunde													
+	int odstep_miedzy_klatkami = 1000 / fps; // wyliczamy czas potrzebny do odtwarzania pliku z prawidlowa prƒôdkoscia
+	float srx = -100.00, sry = -100.00, srx5 = -100.00, srx4 = -100.00, srx3 = -100.00, srx2 = -100.00, srx1 = -100.00, sry5 = -100.00, sry4 = -100.00, sry3 = -100.00, sry2 = -100.00, sry1 = -100.00;
+
+	Mat analiza;
+	while (true)
+	{
+
+		// pobranie kolejnej ramki
+		IplImage* ramka = cvQueryFrame(vid);
+		for (int i = 0; i < licznik; i++)
+		{
+			if (nr == tabwy[i][0])
+			{
+				srx = tabwy[i][1];
+				sry = tabwy[i][2];
+
+			}
+		}
+
+		if ((srx > 320) && (srx<350)) srx = 1.1*srx;
+		if ((srx > 215)&& (srx<250)) srx = 0.8*srx;
+		if ((srx > 480) && (srx<550)) srx = 1.2*srx;
+
+		if (sry < 200) sry = 0.82*sry;
+		if ((sry > 200) && (sry < 238)) sry = 1.15*sry;
+		if ((sry > 249)&& (sry<329)) sry = 1.15*sry;
+		if (sry > 329) sry = 1.35*sry;
+		srx5 = srx4;
+		sry5 = sry4;
+		srx4 = srx3;
+		sry4 = sry3;
+		srx3 = srx2;
+		sry3 = sry2;
+		srx2 = srx1;
+		sry2 = sry1;
+		srx1 = srx;
+		sry1 = sry;
+
+		analiza = cvarrToMat(ramka);
+		Point srodek(srx, sry);
+		Point srodek1(srx1, sry1);
+		Point srodek2(srx2, sry2);
+		Point srodek3(srx3, sry3);
+		Point srodek4(srx4, sry4);
+		Point srodek5(srx5, sry5);
+
+		circle(analiza, srodek5, 10, Scalar(0, 100, 0), 4, 0, 0);
+		circle(analiza, srodek4, 14, Scalar(0, 125, 0), 4, 0, 0);
+		circle(analiza, srodek3, 18, Scalar(0, 150, 0), 4, 0, 0);
+		circle(analiza, srodek2, 22, Scalar(0, 175, 0), 4, 0, 0);
+		circle(analiza, srodek1, 25, Scalar(0, 215, 0), 4, 0, 0);
+		circle(analiza, srodek, 30, Scalar(0, 255, 0), 4, 0, 0);
+
+		if (ramka != 0) // Je≈ºeli nie jest pusta to wy≈õwietlamy
+		{
+			//cvShowImage("plik wideo", ramka);
+			//do≈Ço≈ºone
+			video3.write(analiza);
+			imshow("Obraz z czola i okregi", analiza);
+			nr++;
+		}
+		else
+			break;
+
+		int c = cvWaitKey(odstep_miedzy_klatkami); // Czekamy przez okre≈õlony czas
+
+		if (c == 'k') // Je≈ºeli naci≈õniƒôto klawisz 'k' ko≈Ñczymy wyswietlanie
+			break;
+	}
+
+	video3.release();
+	// zwolnienie zasob√≥w
+	cvDestroyAllWindows();
+	cvReleaseCapture(&vid);
+
+	system("pause");
 }
