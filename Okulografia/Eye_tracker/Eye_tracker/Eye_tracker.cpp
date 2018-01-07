@@ -313,17 +313,17 @@ int main(int argc, char* argv[])
 	fstream wyniki;	// Tworzenie kanałów dla plików
 	const uint CAM_NUM = 2;		//Liczba kamer
 
-	VideoCapture kanalczolo, kanaloko;  //This will hold the VideoCapture objects
+	VideoCapture kanalczolo, kanaloko;  //Obiekty, w których przetrzymujemy dane dla obu kamer
 
 	Mat RamkaCzolo, RamkaOko;  //This will hold the resulting frames from each camera
-	Mat img0, hsv_img0, binary, czolo; //Miejsce na obrazki 
+	Mat img0, hsv_img0, binary, czolo; //Miejsce na klatki
 
 	kanalczolo.open(0);  //Otwieranie strumienia przechwytywania danych
 	kanaloko.open(1);
 
-	int frame_width0 = kanalczolo.get(CV_CAP_PROP_FRAME_WIDTH); //do zapisu wymiary
+	int frame_width0 = kanalczolo.get(CV_CAP_PROP_FRAME_WIDTH); //wymiary do zapisu
 	int frame_height0 = kanalczolo.get(CV_CAP_PROP_FRAME_HEIGHT);
-	int frame_width1 = kanaloko.get(CV_CAP_PROP_FRAME_WIDTH); //do zapisu wymiary
+	int frame_width1 = kanaloko.get(CV_CAP_PROP_FRAME_WIDTH);
 	int frame_height1 = kanaloko.get(CV_CAP_PROP_FRAME_HEIGHT);
 	cout << "Czolo szer. " << frame_width0 << ", wys. " << frame_height0 << endl;
 	cout << "Oko szer. " << frame_width1 << ", wys. " << frame_height1 << endl;
@@ -332,14 +332,12 @@ int main(int argc, char* argv[])
 	VideoWriter video1("Oko.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, Size(frame_width1, frame_height1));
 	VideoWriter video2("Czolo_z_okregami.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, Size(frame_width0, frame_height0));
 	VideoWriter video3("Analiza.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, Size(frame_width0, frame_height0));
-	
-
-//	int ldx = 0, ldy = 0, lgx, lgy, pdx, pdy, pgx, pgy, ro;
+	/*
 	int **tp;
 	tp = new int *[10];
 	for (int i = 0; i < 10; i++)
 		tp[i] = new int[2];
-
+	*/
 	/*
 	//znalezienie parametrów filtra
 	namedWindow("Control", CV_WINDOW_AUTOSIZE);
@@ -387,11 +385,11 @@ int main(int argc, char* argv[])
 		//inRange(hsv_split[0], 80, 255, binary);  //Progowanie zgodnie z wartosciami lowerb, i upperb
 		//inRange(hsv_split[0], Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), binary);
 		inRange(hsv_split[0], Scalar(150, 182, 65), Scalar(163, 215, 111), binary);
-		//morphological opening (remove small objects from the foreground)
+		//usuwanie małych obiektów z planu
 		erode(binary, binary, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 		dilate(binary, binary, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 
-		//morphological closing (fill small holes in the foreground)
+		//wypełnianie małych dziur na pierwszym planie
 		dilate(binary, binary, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 		erode(binary, binary, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
 		*/
@@ -401,10 +399,10 @@ int main(int argc, char* argv[])
 		Mat src_gray;
 		cvtColor(img0, src_gray, CV_BGR2GRAY);
 
-		GaussianBlur(src_gray, src_gray, Size(9, 9), 2, 2);  /// Reduce the noise so we avoid false circle detection
+		GaussianBlur(src_gray, src_gray, Size(9, 9), 2, 2);  // Zmniejszenie hałasów w celu uniknięcie wykrywania fałszywych okręgów
 		vector<Vec3f> circles;
 
-		HoughCircles(src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows / 8, 200, 20, 0, 0); /// Apply the Hough Transform to find the circles
+		HoughCircles(src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows / 8, 200, 20, 0, 0); // Wykonanie transformacji Hough w celu wykrycia okręgów
 		
 		nr++;
 
@@ -434,7 +432,7 @@ int main(int argc, char* argv[])
 		namedWindow("Okregi", CV_WINDOW_AUTOSIZE);
 		imshow("Okregi", img0);
 		video2.write(czolo);
-		imshow("Ooooo", czolo);
+		imshow("Czolo", czolo);
 	}
 	wyniki.close();
 
@@ -539,7 +537,7 @@ int main(int argc, char* argv[])
 		if ((srx > 480) && (srx<550)) srx = 1.2*srx;
 
 		if (sry < 200) sry = 0.82*sry;
-		if ((sry > 200) && (sry < 238)) sry = 1.15*sry;
+		if ((sry > 200) && (sry < 238)) sry = 1.05*sry;
 		if ((sry > 249)&& (sry<329)) sry = 1.15*sry;
 		if (sry > 329) sry = 1.35*sry;
 		srx5 = srx4;
@@ -570,8 +568,6 @@ int main(int argc, char* argv[])
 
 		if (ramka != 0) // Jeżeli nie jest pusta to wyświetlamy
 		{
-			//cvShowImage("plik wideo", ramka);
-			//dołożone
 			video3.write(analiza);
 			imshow("Obraz z czola i okregi", analiza);
 			nr++;
